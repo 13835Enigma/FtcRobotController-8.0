@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -26,10 +27,14 @@ public class Driveyboi extends LinearOpMode {
     static DcMotorEx FL;
     static DcMotorEx BR;
     static DcMotorEx BL;
+    static Servo Tilt;
+    static Servo Claw;
     int speed;
     int LiftTarget;
     double strafe;
     double mult;
+    double TiltPos = 0.5;
+    double ClawPos = 0.5;
 
     public void runOpMode() {
         motorMode driveMode = new motorMode();
@@ -53,6 +58,7 @@ public class Driveyboi extends LinearOpMode {
             angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
             motors.setMotors(gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x,gamepad1.right_stick_y, gamepad1.left_trigger, gamepad1.right_trigger, gamepad1.left_stick_button, gamepad1.right_stick_button);
             lift();
+            Claw();
             tel();
         }
     }
@@ -70,6 +76,25 @@ public class Driveyboi extends LinearOpMode {
         Lift.setTargetPosition(LiftTarget);
 
     }
+    public void Claw() {
+        if (gamepad1.dpad_down) {
+            TiltPos = 0.2;
+        }
+        else if (gamepad1.dpad_up) {
+            TiltPos = 0.8;
+        }
+        else if (gamepad1.dpad_left) {
+            TiltPos = 0.5;
+        }
+        if (gamepad1.left_bumper) {
+            ClawPos += 0.04;
+        }
+        else if (gamepad1.right_bumper) {
+            ClawPos -= 0.04;
+        }
+        Tilt.setPosition(TiltPos);
+        Claw.setPosition(ClawPos);
+    }
     public void tel() {
         telemetry.addData("Angle: ", angles.firstAngle);
         telemetry.addData("Lift: ", Lift.getCurrentPosition());
@@ -78,6 +103,8 @@ public class Driveyboi extends LinearOpMode {
     public void hardWareDecl() {
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         Lift = hardwareMap.get(DcMotorEx.class, "Lift");
+        Tilt = hardwareMap.get(Servo.class, "Tilt");
+        Claw = hardwareMap.get(Servo.class, "Claw");
         FR = hardwareMap.get(DcMotorEx.class, "FR");
         FL = hardwareMap.get(DcMotorEx.class, "FL");
         BR = hardwareMap.get(DcMotorEx.class, "BR");
