@@ -33,6 +33,8 @@ public class Driveyboi extends LinearOpMode {
     int LiftTarget;
     double strafe;
     double mult;
+    double ClawLim[] = {0.94, 0.62};
+    double TiltLim[] = {};
     double TiltPos = 0.5;
     double ClawPos = 0.5;
 
@@ -44,6 +46,7 @@ public class Driveyboi extends LinearOpMode {
         driveMode.changeDriveTrain(DcMotor.RunMode.RUN_USING_ENCODER);
         driveMode.setDirectionDriveTrain(DcMotorSimple.Direction.FORWARD);
         Lift.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        Lift.setTargetPosition(0);
         Lift.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
         Lift.setDirection(DcMotorEx.Direction.REVERSE);
         imuParameters = new BNO055IMU.Parameters();
@@ -78,18 +81,18 @@ public class Driveyboi extends LinearOpMode {
     }
     public void Claw() {
         if (gamepad1.dpad_down) {
-            TiltPos = 0.2;
+            TiltPos += 0.04;
         }
         else if (gamepad1.dpad_up) {
-            TiltPos = 0.8;
+            TiltPos += 0.04;
         }
-        else if (gamepad1.dpad_left) {
+        /*else if (gamepad1.dpad_left) {
             TiltPos = 0.5;
-        }
-        if (gamepad1.left_bumper) {
+        }*/
+        if (gamepad1.right_bumper) {
             ClawPos += 0.04;
         }
-        else if (gamepad1.right_bumper) {
+        else if (gamepad1.left_bumper) {
             ClawPos -= 0.04;
         }
         Tilt.setPosition(TiltPos);
@@ -98,6 +101,8 @@ public class Driveyboi extends LinearOpMode {
     public void tel() {
         telemetry.addData("Angle: ", angles.firstAngle);
         telemetry.addData("Lift: ", Lift.getCurrentPosition());
+        telemetry.addData("Tilt: ", Tilt.getPosition());
+        telemetry.addData("Claw: ", Claw.getPosition());
         telemetry.update();
     }
     public void hardWareDecl() {
